@@ -36,6 +36,18 @@ class Sort {
                 th.swap(drawingArray, th.drawingQueue[drawingIterator].i, th.drawingQueue[drawingIterator].j);
                 drawingIterator++;
             }
+
+            if (th.isSorted(drawingArray)) {
+                clearInterval(draw);
+
+                th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#242424');
+                for (let i = 0; i < drawingArray.length; i++) {
+                    cellWidth = document.body.offsetWidth / drawingArray.length;
+                    let x = i * cellWidth;
+                    let y = 500;
+                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i], '#00ff8c');
+                }
+            }
                 
         }, 1, th);
         // calling sorting algorithm
@@ -79,8 +91,9 @@ class Sort {
             console.log(arr);
         }
 
+        let execTime = 0;
         if (setTimer) {
-            let execTime = performance.now() - t0;
+            execTime = performance.now() - t0;
 
             let time;
             if (log.timer) {
@@ -95,10 +108,8 @@ class Sort {
                 }
                 console.log('%c%s%c sort took ' + time, 'background: #242424; color: #fac916', algorithm, 'background: #242424; color: #bada55');
             }
-
-            
-            return execTime;
         }
+        return execTime;
     }
 
     bubbleSort(arr) {
@@ -186,5 +197,15 @@ class Sort {
         let temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
+    }
+
+    isSorted(arr) {
+        for (let i = 1; i < arr.length; i++) {
+            if (arr[i] < arr[i - 1]) {
+                return false;
+            }
+        }
+    
+        return true;
     }
 }
