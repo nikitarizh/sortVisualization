@@ -2,8 +2,11 @@ class Sort {
 
     d;
     drawingQueue = null;
+    draw;
 
     sort(algorithm, arr, setTimer = false, log = null) {
+
+        this.clear();
 
         this.d = new Draw('canv');
         this.drawingQueue = [];
@@ -24,7 +27,7 @@ class Sort {
         let cellWidth;
         let th = this;
             
-        let draw = setInterval(function(th) {
+        this.draw = setInterval(function(th) {
             th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#000');
             for (let i = 0; i < drawingArray.length; i++) {
                 cellWidth = document.body.offsetWidth / drawingArray.length;
@@ -38,7 +41,7 @@ class Sort {
             }
 
             if (th.isSorted(drawingArray)) {
-                clearInterval(draw);
+                clearInterval(this.draw);
 
                 th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#242424');
                 for (let i = 0; i < drawingArray.length; i++) {
@@ -81,6 +84,12 @@ class Sort {
                     t0 = performance.now();
                 }
                 this.shellSort(arr);
+                break;
+            case 'gnome':
+                if (setTimer) {
+                    t0 = performance.now();
+                }
+                this.gnomeSort(arr);
                 break;
             default:
                 throw new Error('Incorrect alrgorithm');
@@ -193,6 +202,20 @@ class Sort {
         }
     }
 
+    gnomeSort(arr) {
+        let i = 0;
+        while (i < arr.length) {
+            if (i == 0 || arr[i] >= arr[i - 1]) {
+                i++;
+            }
+            else {
+                this.swap(arr, i, i - 1);
+                this.drawingQueue.push( { i: i, j: i - 1 } );
+                i--;
+            }
+        }
+    }
+
     swap(arr, i, j) {
         let temp = arr[i];
         arr[i] = arr[j];
@@ -207,5 +230,15 @@ class Sort {
         }
     
         return true;
+    }
+
+    clear() {
+        console.log(this.draw);
+        if (this.draw !== undefined) {
+            console.log(this.draw);
+            clearInterval(this.draw);
+            this.drawingQueue = null;
+            this.d = null;
+        }
     }
 }

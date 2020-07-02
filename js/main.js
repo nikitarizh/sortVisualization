@@ -1,37 +1,29 @@
 let arr = [];
+let arrLength = 1e2;
+
+const lengthInput = document.getElementById('length');
 
 function main() {
-
-    for (let i = 0; i < 1e2; i++) {
-        arr.push(Math.trunc(Math.random() * 490 + 5));
-    }
 
     let s = new Sort();
     let d = new Draw('canv');
 
-    s.sort('shaker', arr, true, { io: false, timer: true });
+    lengthInput.value = arrLength;
 
-    // shuffle(arr);
+    lengthInput.addEventListener('focusout', function() {
+        arrLength = lengthInput.value;
+    });
 
-    // s.sort('bubble', arr, true, { io: false, timer: true });
+    Array.prototype.forEach.call(document.getElementsByClassName('button'), function(elem) {
+        elem.addEventListener('click', function() {
+            arr = [];
+            for (let i = 0; i < arrLength; i++) {
+                arr.push(Math.trunc(Math.random() * 490 + 5));
+            }
 
-    // shuffle(arr);
-
-    // s.sort('comb', arr, true, { io: false, timer: true });
-    // console.log(isSorted(arr));
-
-    // shuffle(arr);
-
-    // s.sort('insertion', arr, true, { io: false, timer: true });
-    // console.log(isSorted(arr));
-
-    // shuffle(arr);
-
-    // s.sort('shell', arr, true, { io: false, timer: true });
-    // console.log(isSorted(arr));
-
-    // shuffle(arr);
-
+            s.sort(this.id, arr, true, { io: false, timer: true });
+        });
+    });
 }
 
 function shuffle(arr) {

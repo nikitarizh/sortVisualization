@@ -3,11 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
     <title>Visualization</title>
 </head>
 <body>
     
     <canvas id="canv" height="500"></canvas>
+
+    <div class="length">
+        <input type="text" id="length">
+    </div>
+    <div class="buttons">
+        <div>
+            <span class="button" id="bubble">Bubble sort</span>
+        </div>
+        <div>
+            <span class="button" id="shaker">Shaker sort</span>
+        </div>
+        <div>
+            <span class="button" id="comb">Comb sort</span>
+        </div>
+        <div>
+            <span class="button" id="insertion">Insertion sort</span>
+        </div>
+        <div>
+            <span class="button" id="shell">Shell sort</span>
+        </div>
+        <div>
+            <span class="button" id="gnome">Gnome sort</span>
+        </div>
+    </div>
 
     <!-- SORTING ALGORITHMS -->
     <script src="js/Sort.js"></script>
