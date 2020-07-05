@@ -7,13 +7,13 @@ It's a script which shows you how different algorithms sort arrays, so you can u
 3. Click on a button titled with the type of sorting you want to be visualized
 4. Enjoy!
 ## TODO list:
- [x] Bubble sort
- [x] Shaker sort
- [x] Comb sort
- [x] Insertion sort
- [x] Shell sort
- [x] Gnome sort
- [x] Selection sort
- [ ] Merge sort
- [ ] Counting sort
- [ ] ...and more
+ - [x] Bubble sort
+ - [x] Shaker sort
+ - [x] Comb sort
+ - [x] Insertion sort
+ - [x] Shell sort
+ - [x] Gnome sort
+ - [x] Selection sort
+ - [ ] Merge sort
+ - [ ] Counting sort
+ - [ ] ...and more
