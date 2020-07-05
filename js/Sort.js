@@ -41,7 +41,7 @@ class Sort {
             }
 
             if (th.isSorted(drawingArray)) {
-                clearInterval(this.draw);
+                clearInterval(th.draw);
 
                 th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#242424');
                 for (let i = 0; i < drawingArray.length; i++) {
