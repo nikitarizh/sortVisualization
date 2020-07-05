@@ -91,6 +91,18 @@ class Sort {
                 }
                 this.gnomeSort(arr);
                 break;
+            case 'selection':
+                if (setTimer) {
+                    t0 = performance.now();
+                }
+                this.selectionSort(arr);
+                break;
+            case 'merge':
+                if (setTimer) {
+                    t0 = performance.now();
+                }
+                arr = this.mergeSort(arr);
+                break;
             default:
                 throw new Error('Incorrect alrgorithm');
         }
@@ -214,6 +226,55 @@ class Sort {
                 i--;
             }
         }
+    }
+
+    selectionSort(arr) {
+        for (let i = 0; i < arr.length - 1; i++) {
+            let minInd = i;
+            for (let j = i + 1; j < arr.length; j++) {
+                if (arr[j] < arr[minInd]) {
+                    minInd = j;
+                }
+            }
+            this.swap(arr, i, minInd);
+        }
+    }
+
+    // TODO: visualize
+    mergeSort(arr) {
+
+        if (arr.length <= 1) {
+            return arr;
+        }
+
+        let arr1 = this.mergeSort(arr.slice(0, arr.length / 2));
+        let arr2 = this.mergeSort(arr.slice(arr.length / 2, arr.length));
+
+        let output = [];
+        let i1 = 0, i2 = 0;
+        while (i1 < arr1.length && i2 < arr2.length) {
+            if (arr1[i1] < arr2[i2]) {
+                output.push(arr1[i1]);
+                i1++;
+            }
+            else {
+                output.push(arr2[i2]);
+                i2++;
+            }
+        }
+
+        if (i1 != arr1.length) {
+            for (let i = i1; i < arr1.length; i++) {
+                output.push(arr1[i]);
+            }
+        }
+        if (i2 != arr2.length) {
+            for (let i = i2; i < arr2.length; i++) {
+                output.push(arr2[i]);
+            }
+        }
+
+        return output;
     }
 
     swap(arr, i, j) {
