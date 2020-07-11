@@ -6,6 +6,35 @@ html {
     background-color: #fcfcfc;
 }
 
+
+.params {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.params .inputWrapper {
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.params .inputWrapper input {
+    line-height: 2em;
+    width: 40px;
+    border: 0;
+    text-align: right;
+}
+
+.params .inputWrapper span {
+    padding-left: 5px;
+}
+
+.params .inputWrapper input:focus {
+    outline: none;
+}
+
 .buttons {
     width: 100%;
     display: grid;
@@ -34,19 +63,4 @@ html {
     background-color: #3f3f3f;
     border: 1px solid #3f3f3f;
     color: #fff;
-}
-
-.length {
-    margin-top: 20px;
-    width: 100%;
-    text-align: center;
-}
-
-.length input {
-    line-height: 2em;
-    width: 40px;
-}
-
-.length input:focus {
-    outline: none;
 }

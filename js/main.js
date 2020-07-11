@@ -1,29 +1,58 @@
 let arr = [];
 let arrLength = 1e2;
 
+let delay = 20;
+
 const lengthInput = document.getElementById('length');
+const delayInput = document.getElementById('delay');
 
 function main() {
 
+    init();
+
     let s = new Sort();
-    let d = new Draw('canv');
 
     lengthInput.value = arrLength;
+    delayInput.value = 20;
 
     lengthInput.addEventListener('focusout', function() {
         arrLength = lengthInput.value;
     });
 
+    delayInput.addEventListener('focusout', function() {
+        delay = delayInput.value;
+    });
+
     Array.prototype.forEach.call(document.getElementsByClassName('button'), function(elem) {
         elem.addEventListener('click', function() {
-            arr = [];
-            for (let i = 0; i < arrLength; i++) {
-                arr.push(Math.trunc(Math.random() * 490 + 5));
+            
+            if (isSorted(arr)) {
+                arr = [];
+                for (let i = 0; i < arrLength; i++) {
+                    arr.push(Math.trunc(Math.random() * 490 + 5));
+                }
             }
 
-            s.sort(this.id, arr, true, { io: false, timer: true });
+            s.sort(this.id, arr, delay, true, { io: false, timer: true });
         });
     });
+}
+
+function init() {
+    for (let i = 0; i < arrLength; i++) {
+        arr.push(Math.trunc(Math.random() * 490 + 5));
+    }
+
+    let d = new Draw('canv');
+
+    d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#000');
+    for (let i = 0; i < arr.length; i++) {
+        cellWidth = document.body.offsetWidth / arr.length;
+        let x = i * cellWidth;
+        let y = 500;
+        let col = 'rgb(0, ' + Sort.getColor(arr, arr[i]) + ', 0)';
+        d.drawRectangle(x, y, cellWidth, -arr[i], col);
+    }
 }
 
 function shuffle(arr) {
