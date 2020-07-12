@@ -6,6 +6,8 @@ html {
     background-color: #fcfcfc;
 }
 
+/* ***** PARAMETERS BEGIN *****  */
+
 .params {
     width: 100%;
     display: flex;
@@ -33,6 +35,10 @@ html {
 .params .inputWrapper input:focus {
     outline: none;
 }
+
+/* ***** PARAMETERS END *****  */
+
+/* ***** BUTTONS BEGIN *****  */
 
 .buttons {
     width: 100%;
@@ -67,3 +73,5 @@ html {
 button:focus {
     outline: none;
 }
+
+/* ***** BUTTONS END *****  */

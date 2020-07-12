@@ -9,9 +9,12 @@
 </head>
 <body>
     
+    <!-- canvas (wow) -->
     <canvas id="canv" height="500"></canvas>
 
+    <!-- parameters inputs, stats outputs -->
     <div class="params">
+        <!-- stats -->
         <div class="stats">
             <div>
                 <span>Comparisons: </span><span id="comparisons">0</span>
@@ -20,16 +23,25 @@
                 <span>Swaps: </span><span id="swaps">0</span>
             </div>
         </div>
+
+        <!-- array length input -->
         <div class="inputWrapper">
             <input type="text" id="length"><span>elements</span>
         </div>
+
+        <!-- frame time input -->
         <div class="inputWrapper">
             <input type="text" id="delay"><span>ms</span>
         </div>
+
+        <!-- enabling audio input -->
         <div class="inputWrapper">
             <button id="enableAudio">Enable audio</button>
         </div>
+
     </div>
+
+    <!-- sorting algorithms buttons -->
     <div class="buttons">
         <div>
             <span class="button" id="bubble">Bubble sort</span>

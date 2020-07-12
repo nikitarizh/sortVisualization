@@ -1,45 +1,28 @@
+// Sort class
+
 class Sort {
 
+    // Draw class
     d;
-    drawingQueue = null;
+    // queue which contains order of sorting (for drawing)
+    drawingQueue = [];
+    // drawing interval
     draw;
+    // audio context
     audio;
+    // audio output
     oscillator;
+    // stats
     comparisons = 0;
     swaps = 0;
 
     sort(algorithm, arr, delay, audio, setTimer = false, log = null) {
 
+        // clearing previous sorting
         this.clear();
 
-        this.d = new Draw('canv');
-        this.drawingQueue = [];
-        let drawingIterator = 0;
-
+        // setting up audio
         this.audio = audio.audio;
-        
-        // array verification
-        if (arr === undefined || arr === null || arr.length === 0) {
-            throw new Error('Incorrect array');
-        }
-
-        if (log.io) {
-            console.log('input array:');
-            console.log(arr);
-        }
-
-        let t0;
-        let drawingArray = [];
-        for (let i = 0; i < arr.length; i++) {
-            drawingArray.push( { val: arr[i], swapped: false, compared: false });
-        }
-
-        let cellWidth;
-        let th = this;
-
-        let comparisonsStats = document.querySelector('.stats #comparisons');
-        let swapsStats = document.querySelector('.stats #swaps');
-
         if (audio.enabled) {
             this.oscillator = this.audio.createOscillator();
             this.oscillator.connect(this.audio.destination);
@@ -47,139 +30,184 @@ class Sort {
             this.oscillator.start(0);
         }
         
+        // array verification
+        if (arr === undefined || arr === null || arr.length === 0) {
+            throw new Error('Incorrect array');
+        }
+
+        // logging
+        if (log.io) {
+            console.log('input array:');
+            console.log(arr);
+        }
+
+        // stats DOM elements
+        let comparisonsStats = document.querySelector('.stats #comparisons');
+        let swapsStats = document.querySelector('.stats #swaps');
+
+        // initializing drawing class
+        this.d = new Draw('canv');
+
+        // copying initial array to drawingArray
+        // drawingArray will be modified using the drawingQueue
+        let drawingArray = [];
+        for (let i = 0; i < arr.length; i++) {
+            drawingArray.push( { val: arr[i], swapped: false, compared: false });
+        }
+
+        // width of one array element (column)
+        let cellWidth;
+        // defining this for setInterval
+        let th = this;
+        // variable for clearing interval
         let sorted = false;
+        // drawingQueue iterator
+        let drawingIterator = 0;
+        // drawing
         this.draw = setInterval(function(th) {
+            // drawing background
             th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#000');
+
+            //drawing elements
             for (let i = 0; i < drawingArray.length; i++) {
+                // calculating width of columns
                 cellWidth = document.body.offsetWidth / drawingArray.length;
+
+                // calculating coordinates
                 let x = i * cellWidth;
                 let y = 500;
+
+                // if this element was swapped...
                 if (drawingArray[i].swapped) {
+                    // ...playing audio,
                     if (audio.enabled) {
                         th.oscillator.frequency.value = drawingArray[i].val / 2;
                     }
 
+                    // drawing,
                     th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, '#ff5500');
 
+                    // it's swapped
                     drawingArray[i].swapped = false;
                 }
+                // if this element was compared...
                 else if (drawingArray[i].compared) {
+                    // ...playing audio,
                     if (audio.enabled) {
                         th.oscillator.frequency.value = drawingArray[i].val * 2;
                     }
 
+                    //drawing,
                     th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, '#fffb00');
 
+                    //it's compared
                     drawingArray[i].compared = false;
                 }
+                // if the array is sorted, all the elements have sorted attribute set true
                 else if (drawingArray[i].sorted) {
+                    // playing audio
                     th.oscillator.frequency.value = drawingArray[i].val * 2;
+
+                    // drawing blue column
                     let col = 'rgb(0, 0, ' + th.constructor.getColor(arr, drawingArray[i].val);
                     th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
                 }
+                // if the element is the element
                 else {
+                    //drawing green column
                     let col = 'rgb(0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ', 0)';
-
                     th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
                 }
             }
+            // if there are unprocessed changes
             if (th.drawingQueue.length > drawingIterator) {
+                // elements that have been swapped, compared, etc.
                 let i = th.drawingQueue[drawingIterator].elements.i;
                 let j = th.drawingQueue[drawingIterator].elements.j;
+
+                // if they were swapped...
                 if (th.drawingQueue[drawingIterator].op === 'swap') {
+                    // ...swap them in the drawingArray
                     th.swap(drawingArray, i, j);
+
+                    // they will be highlighted on next iteration
                     drawingArray[i].swapped = true;
                     drawingArray[j].swapped = true;
+
+                    //changing stats
                     th.swaps++;
                     th.comparisons++;
                 }
+                // if they were compared...
                 else if (th.drawingQueue[drawingIterator].op === 'comp') {
+                    // ...they will be highlighted on next iteration
                     drawingArray[i].compared = true;
                     drawingArray[j].compared = true;
+
+                    //changing stats
                     th.comparisons++;
                 }
+                // when the array is sorted we set the sorted attribute to true
                 else if (th.drawingQueue[drawingIterator].op === 'sorted') {
                     th.comparisons++;
                     drawingArray[i].sorted = true;
                 }
                 
+                // proceed to next element in queue
                 drawingIterator++;
             }
+            // if the array is sorted and we drew it (made everything blue)...
             else if (sorted) {
+                // ...we clear draw loop...
                 clearInterval(th.draw);
+
+                // ...and stop audio
                 th.oscillator.stop(th.audio.currentTime + 0.1);
             }
+            // if the array is sorted but isn't drew (it isn't blue)...
             else if (th.isSorted(drawingArray)) {
+                // ...push all the elements to drawingQueue
                 for (let i = 0; i < drawingArray.length; i++) {
                     th.drawingQueue.push({
                         elements: { i, j: i},
                         op: 'sorted'
                     });
                 }
+                
+                // and clear draw loop on next iteration
                 sorted = true;
             }
+
+            // changing stats
             comparisonsStats.innerHTML = th.comparisons;
             swapsStats.innerHTML = th.swaps;
         }, delay, th);
-        // calling sorting algorithm
-        switch (algorithm) {
-            case 'bubble':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                this.bubbleSort(arr);
-                break;
-            case 'shaker':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                this.shakerSort(arr);
-                break;
-            case 'comb':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                this.combSort(arr);
-                break;
-            case 'insertion':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                this.insertionSort(arr);
-                break;
-            case 'shell':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                this.shellSort(arr);
-                break;
-            case 'gnome':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                this.gnomeSort(arr);
-                break;
-            case 'selection':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                this.selectionSort(arr);
-                break;
-            case 'merge':
-                if (setTimer) {
-                    t0 = performance.now();
-                }
-                arr = this.mergeSort(arr);
-                break;
-            default:
-                throw new Error('Incorrect alrgorithm');
+
+
+        // timer initial value
+        let t0;
+        if (setTimer) {
+            t0 = performance.now();
         }
 
+        // calling sorting algorithm
+        try {
+            let algo = algorithm + 'Sort';
+            console.log(algo);
+            this[algo](arr);
+        } 
+        catch (e) {
+            console.log(e);
+            throw new Error('Incorrect alrgorithm');
+        }
+
+        // logging
         if (log.io) {
             console.log('output array:');
             console.log(arr);
         }
 
+        // logging
         let execTime = 0;
         if (setTimer) {
             execTime = performance.now() - t0;
@@ -200,6 +228,8 @@ class Sort {
         }
         return execTime;
     }
+
+    // ***** SORTING ALGORITHMS BEGIN *****
 
     bubbleSort(arr) {
         for (let i = 0; i < arr.length - 1; i++) {
@@ -362,12 +392,16 @@ class Sort {
         return output;
     }
 
+    // ***** SORTING ALGORITHMS END *****
+
+    // swap arr[i] and arr[j]
     swap(arr, i, j) {
         let temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
     }
 
+    // check if arr is sorted
     isSorted(arr) {
         for (let i = 1; i < arr.length; i++) {
             if (arr[i].val < arr[i - 1].val) {
@@ -378,29 +412,42 @@ class Sort {
         return true;
     }
 
+    // clear previous sorting
     clear() {
+        // if there was a sorting
         if (this.draw !== undefined) {
+
+            // we stop it
             clearInterval(this.draw);
-            this.drawingQueue = null;
-            this.d = null;
 
-            this.swaps = 0;
-            this.comparisons = 0;
-
+            // stop audio
             try {
                 this.oscillator.stop(this.audio.currentTime);
             }
-            catch (e) {}
+            catch (e) {
+                // yeah
+                // i'll fix it
+            }
+            
+            // set everything to null/0
+            this.drawingQueue = [];
+            this.d = null;
+            this.swaps = 0;
+            this.comparisons = 0;
             this.audio = null;
+
         }
     }
 
+    // push 'swap' operation to the drawingQueue
     swapPush(i, j) {
         this.drawingQueue.push({
             elements: { i, j },
             op: 'swap'
         });
     }
+
+    // push 'compare' operation to the drawingQueue
     compPush(i, j) {
         this.drawingQueue.push({
             elements: { i, j },
@@ -408,6 +455,7 @@ class Sort {
         });
     }
 
+    // normalize arr[i] in range [70, 220] (to get color based on value of array element)
     static getColor(arr, x) {
         let mn = 1e9;
         let mx = 0;
