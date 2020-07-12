@@ -2,16 +2,21 @@
 
 class Sort {
 
-    // Draw class
+    // Draw class instance
     d;
+
     // queue which contains order of sorting (for drawing)
     drawingQueue = [];
+
     // drawing interval
     draw;
+
     // audio context
     audio;
+
     // audio output
     oscillator;
+
     // stats
     comparisons = 0;
     swaps = 0;
@@ -57,12 +62,16 @@ class Sort {
 
         // width of one array element (column)
         let cellWidth;
+
         // defining this for setInterval
         let th = this;
+
         // variable for clearing interval
         let sorted = false;
+
         // drawingQueue iterator
         let drawingIterator = 0;
+
         // drawing
         this.draw = setInterval(function(th) {
             // drawing background
@@ -70,6 +79,7 @@ class Sort {
 
             //drawing elements
             for (let i = 0; i < drawingArray.length; i++) {
+
                 // calculating width of columns
                 cellWidth = document.body.offsetWidth / drawingArray.length;
 
@@ -79,6 +89,7 @@ class Sort {
 
                 // if this element was swapped...
                 if (drawingArray[i].swapped) {
+
                     // ...playing audio,
                     if (audio.enabled) {
                         th.oscillator.frequency.value = drawingArray[i].val / 2;
@@ -92,6 +103,7 @@ class Sort {
                 }
                 // if this element was compared...
                 else if (drawingArray[i].compared) {
+
                     // ...playing audio,
                     if (audio.enabled) {
                         th.oscillator.frequency.value = drawingArray[i].val * 2;
@@ -105,6 +117,7 @@ class Sort {
                 }
                 // if the array is sorted, all the elements have sorted attribute set true
                 else if (drawingArray[i].sorted) {
+
                     // playing audio
                     th.oscillator.frequency.value = drawingArray[i].val * 2;
 
@@ -114,6 +127,7 @@ class Sort {
                 }
                 // if the element is the element
                 else {
+
                     //drawing green column
                     let col = 'rgb(0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ', 0)';
                     th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
@@ -121,6 +135,7 @@ class Sort {
             }
             // if there are unprocessed changes
             if (th.drawingQueue.length > drawingIterator) {
+
                 // elements that have been swapped, compared, etc.
                 let i = th.drawingQueue[drawingIterator].elements.i;
                 let j = th.drawingQueue[drawingIterator].elements.j;
@@ -158,6 +173,7 @@ class Sort {
             }
             // if the array is sorted and we drew it (made everything blue)...
             else if (sorted) {
+
                 // ...we clear draw loop...
                 clearInterval(th.draw);
 
@@ -166,6 +182,7 @@ class Sort {
             }
             // if the array is sorted but isn't drew (it isn't blue)...
             else if (th.isSorted(drawingArray)) {
+                
                 // ...push all the elements to drawingQueue
                 for (let i = 0; i < drawingArray.length; i++) {
                     th.drawingQueue.push({
