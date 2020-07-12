@@ -18,9 +18,21 @@ Array.prototype.minMax = function() {
 
 // check if array is sorted
 Array.prototype.isSorted = function() {
-    for (let i = 1; i < this.length; i++) {
-        if (this[i].val < this[i - 1].val) {
-            return false;
+    
+    // for drawing array
+    if (this[0].val !== undefined) {
+        for (let i = 1; i < this.length; i++) {
+            if (this[i].val < this[i - 1].val) {
+                return false;
+            }
+        }
+    }
+    // for regular array
+    else {
+        for (let i = 1; i < this.length; i++) {
+            if (this[i] < this[i - 1]) {
+                return false;
+            }
         }
     }
 

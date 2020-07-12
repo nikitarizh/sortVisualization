@@ -16,8 +16,28 @@ const shapesInputs = document.getElementsByClassName('shape');
 
 function main() {
 
+
+    // ***** INITIALIZATION *****
+
+
+    // initializing Drawing queue
+    let dq = new DrawingQueue();
+
+    // initializing Sort class
+    let s = new Sort(dq);
+
+    // initializing Draw class
+    let d = new Draw('canv', dq);
+
     // push random elements to arr and draw it
-    init();
+    fillArray(d);
+
+
+    // ***** INITIALIZATION END *****
+
+
+    // ***** AUDIO *****
+
 
     // setting up audio
     let audioEnabled = false;
@@ -42,7 +62,13 @@ function main() {
         document.getElementById('enableAudio').disabled = 'true';
         document.getElementsByClassName('chromeOnly')[0].style.display = 'inline';
     }
+
+    // ***** AUDIO END *****
+
+
+    // ***** PARAMETERS INPUTS *****
     
+
     // default values in inputs
     lengthInput.value = arrLength;
     delayInput.value = 20;
@@ -73,17 +99,24 @@ function main() {
         })
     });
 
-    // initializing Sort class
-    let s = new Sort();
+
+    // ***** PARAMETERS INPUTS END *****
+
+
+    // ***** LAUNCHING SORTING ALGORITHMS
 
     // setting event listeners for sorting algorithms buttons
     Array.prototype.forEach.call(document.getElementsByClassName('button'), function(elem) {
         elem.addEventListener('click', function() {
 
+            // clearing previous sorting
+            clear(d, dq);
+
+            // scrolling to the top
             window.scrollTo(0, 0);
 
-            // if the array is sorted, empty it and fill with new elements
-            if (arr.isSorted() || arrLength !== 1e2) {
+            // if the array is sorted, then empty it and fill with new elements
+            if (arr.isSorted() || arrLength !== 100) {
                 arr = [];
                 for (let i = 0; i < arrLength; i++) {
                     arr.push(Math.trunc(Math.random() * 490 + 5));
@@ -104,26 +137,26 @@ function main() {
                 timer: true
             }
 
-            // sort it
+            // start drawing (setting draw interval)
+            d.draw(arr, params);
+
+            // start sorting
             s.sort(this.id, arr, params, loggingParams);
         });
     });
 }
 
 // is called on page load
-function init() {
-
+function fillArray(d) {
     // fill the array with random elements
     for (let i = 0; i < arrLength; i++) {
         arr.push(Math.trunc(Math.random() * 490 + 5));
     }
 
-    // initialize drawing class
-    let d = new Draw('canv');
-
     // draw the array
     d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#000');
     for (let i = 0; i < arr.length; i++) {
+        console.log('call');
         cellWidth = document.body.offsetWidth / arr.length;
         let x = i * cellWidth;
         let y = 500;
@@ -138,5 +171,30 @@ function init() {
         else if (shape === 'circles') {
             d.drawCircle(x + cellWidth / 2, y - arr[i] + cellWidth / 2, cellWidth / 2, col);
         }
+    }
+}
+
+// clears previous sorting
+function clear(draw, dq) {
+    if (draw.drawingInterval !== undefined) {
+
+        // stop drawing
+        clearInterval(draw.drawingInterval);
+
+        // stop audio
+        try {
+            draw.oscillator.stop(draw.audio.context.currentTime);
+        }
+        catch (e) {
+            // yeah
+            // i'll fix it
+        }
+
+        // set everything to null/0
+        dq.clear();
+        draw.swaps = 0;
+        draw.comparisons = 0;
+        draw.audio = null;
+        draw.oscillator = null;
     }
 }
