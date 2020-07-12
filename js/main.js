@@ -64,7 +64,7 @@ function main() {
         elem.addEventListener('click', function() {
 
             // if the array is sorted, empty it and fill with new elements
-            if (isSorted(arr)) {
+            if (isSorted(arr) || arrLength !== 1e2) {
                 arr = [];
                 for (let i = 0; i < arrLength; i++) {
                     arr.push(Math.trunc(Math.random() * 490 + 5));
@@ -79,7 +79,7 @@ function main() {
 
 // is called on page load
 function init() {
-    
+
     // fill the array with random elements
     for (let i = 0; i < arrLength; i++) {
         arr.push(Math.trunc(Math.random() * 490 + 5));
