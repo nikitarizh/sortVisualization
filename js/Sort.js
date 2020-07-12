@@ -5,6 +5,8 @@ class Sort {
     draw;
     audio;
     oscillator;
+    comparisons = 0;
+    swaps = 0;
 
     sort(algorithm, arr, delay, audio, setTimer = false, log = null) {
 
@@ -34,6 +36,9 @@ class Sort {
 
         let cellWidth;
         let th = this;
+
+        let comparisonsStats = document.querySelector('.stats #comparisons');
+        let swapsStats = document.querySelector('.stats #swaps');
 
         if (audio.enabled) {
             this.oscillator = this.audio.createOscillator();
@@ -85,12 +90,16 @@ class Sort {
                     th.swap(drawingArray, i, j);
                     drawingArray[i].swapped = true;
                     drawingArray[j].swapped = true;
+                    th.swaps++;
+                    th.comparisons++;
                 }
                 else if (th.drawingQueue[drawingIterator].op === 'comp') {
                     drawingArray[i].compared = true;
                     drawingArray[j].compared = true;
+                    th.comparisons++;
                 }
                 else if (th.drawingQueue[drawingIterator].op === 'sorted') {
+                    th.comparisons++;
                     drawingArray[i].sorted = true;
                 }
                 
@@ -109,6 +118,8 @@ class Sort {
                 }
                 sorted = true;
             }
+            comparisonsStats.innerHTML = th.comparisons;
+            swapsStats.innerHTML = th.swaps;
         }, delay, th);
         // calling sorting algorithm
         switch (algorithm) {
@@ -195,16 +206,10 @@ class Sort {
             for (let j = i + 1; j < arr.length; j++) {
                 if (arr[j] < arr[i]) {
                     this.swap(arr, i, j);
-                    this.drawingQueue.push({
-                        elements: { i, j },
-                        op: 'swap'
-                    });
+                    this.swapPush(i, j);
                 }
                 else {
-                    this.drawingQueue.push({
-                        elements: { i, j },
-                        op: 'comp'
-                    })
+                    this.compPush(i, j);
                 }
             }
         }
@@ -216,16 +221,10 @@ class Sort {
             for (let i = left; i < right; i++) {
                 if (arr[i + 1] < arr[i]) {
                     this.swap(arr, i, i + 1);
-                    this.drawingQueue.push({
-                        elements: { i, j: i + 1 },
-                        op: 'swap'
-                    });
+                    this.swapPush(i, i + 1);
                 }
                 else {
-                    this.drawingQueue.push({
-                        elements: { i, j: i + 1 },
-                        op: 'comp'
-                    })
+                    this.compPush(i, i + 1);
                 }
             }
             right--;
@@ -233,16 +232,10 @@ class Sort {
             for (let i = right; i > left; i--) {
                 if (arr[i - 1] > arr[i]) {
                     this.swap(arr, i, i - 1);
-                    this.drawingQueue.push({
-                        elements: { i, j: i - 1 },
-                        op: 'swap'
-                    });
+                    this.swapPush(i, i - 1);
                 }
                 else {
-                    this.drawingQueue.push({
-                        elements: { i, j: i - 1 },
-                        op: 'comp'
-                    })
+                    this.compPush(i, i - 1);
                 }
             }
             left++;
@@ -256,16 +249,10 @@ class Sort {
             for (let i = 0; i + step < arr.length; i++) {
                 if (arr[i + step] < arr[i]) {
                     this.swap(arr, i, i + step);
-                    this.drawingQueue.push({
-                        elements: { i, j: i + step },
-                        op: 'swap'
-                    });
+                    this.swapPush(i, i + step);
                 }
                 else {
-                    this.drawingQueue.push({
-                        elements: { i, j: i + step },
-                        op: 'comp'
-                    })
+                    this.compPush(i, i + step);
                 }
             }
             step = Math.floor(step / k);
@@ -277,17 +264,11 @@ class Sort {
             for (let i = 0; i < arr.length - 1; i++) {
                 if (arr[i + 1] < arr[i]) {
                     this.swap(arr, i, i + 1);
-                    this.drawingQueue.push({
-                        elements: { i, j: i + 1 },
-                        op: 'swap'
-                    });
+                    this.swapPush(i, i + 1);
                     swapped = true;
                 }
                 else {
-                    this.drawingQueue.push({
-                        elements: { i, j: i + 1 },
-                        op: 'comp'
-                    })
+                    this.compPush(i, i + 1);
                 }
             }
         }
@@ -297,10 +278,7 @@ class Sort {
         for (let i = 1; i < arr.length; i++) {
             for (let j = i; j > 0 && arr[j - 1] > arr[j]; j--) {
                 this.swap(arr, j, j - 1);
-                this.drawingQueue.push({
-                    elements: { i: j, j: j - 1 },
-                    op: 'swap'
-                });
+                this.swapPush(j, j - 1);
             }
         }
     }
@@ -311,10 +289,7 @@ class Sort {
             for (let i = step; i < arr.length; i++) {
                 for (let j = i - step; j >= 0 && arr[j + step] < arr[j]; j -= step) {
                     this.swap(arr, j, j + step);
-                    this.drawingQueue.push({
-                        elements: { i: j, j: j + step },
-                        op: 'swap'
-                    });
+                    this.swapPush(j, j + step);
                 }
             }
 
@@ -330,10 +305,7 @@ class Sort {
             }
             else {
                 this.swap(arr, i, i - 1);
-                this.drawingQueue.push({
-                    elements: { i, j: i - 1 },
-                    op: 'swap'
-                });
+                this.swapPush(i, i - 1);
                 i--;
             }
         }
@@ -343,20 +315,13 @@ class Sort {
         for (let i = 0; i < arr.length - 1; i++) {
             let minInd = i;
             for (let j = i + 1; j < arr.length; j++) {
-                this.drawingQueue.push({
-                    elements: { i: j, j: minInd },
-                    op: 'comp'
-                })
+                this.compPush(j, minInd);
                 if (arr[j] < arr[minInd]) {
                     minInd = j;
                 }
             }
             this.swap(arr, i, minInd);
-            console.log('pushing');
-            this.drawingQueue.push({
-                elements: { i, j: minInd },
-                op: 'swap'
-            });
+            this.swapPush(i, minInd);
         }
     }
 
@@ -418,12 +383,29 @@ class Sort {
             clearInterval(this.draw);
             this.drawingQueue = null;
             this.d = null;
+
+            this.swaps = 0;
+            this.comparisons = 0;
+
             try {
                 this.oscillator.stop(this.audio.currentTime);
             }
             catch (e) {}
             this.audio = null;
         }
+    }
+
+    swapPush(i, j) {
+        this.drawingQueue.push({
+            elements: { i, j },
+            op: 'swap'
+        });
+    }
+    compPush(i, j) {
+        this.drawingQueue.push({
+            elements: { i, j },
+            op: 'comp'
+        });
     }
 
     static getColor(arr, x) {
