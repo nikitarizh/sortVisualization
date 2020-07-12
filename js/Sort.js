@@ -74,6 +74,7 @@ class Sort {
 
         // drawing
         this.draw = setInterval(function(th) {
+
             // drawing background
             th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#000');
 
@@ -119,7 +120,9 @@ class Sort {
                 else if (drawingArray[i].sorted) {
 
                     // playing audio
-                    th.oscillator.frequency.value = drawingArray[i].val * 2;
+                    if (audio.enabled) {
+                        th.oscillator.frequency.value = drawingArray[i].val * 2;
+                    }
 
                     // drawing blue column
                     let col = 'rgb(0, 0, ' + th.constructor.getColor(arr, drawingArray[i].val);
@@ -178,11 +181,13 @@ class Sort {
                 clearInterval(th.draw);
 
                 // ...and stop audio
-                th.oscillator.stop(th.audio.currentTime + 0.1);
+                if (audio.enabled) {
+                    th.oscillator.stop(th.audio.currentTime + 0.1);
+                }
             }
             // if the array is sorted but isn't drew (it isn't blue)...
             else if (th.isSorted(drawingArray)) {
-                console.log('sorted?');
+
                 // ...push all the elements to drawingQueue
                 for (let i = 0; i < drawingArray.length; i++) {
                     th.drawingQueue.push({
@@ -431,7 +436,7 @@ class Sort {
 
     // clear previous sorting
     clear() {
-        
+
         // if there was a sorting
         if (this.draw !== undefined) {
 
