@@ -6,14 +6,14 @@ class Sort {
         // Draw class instance
         this.d = null;
 
+        // Audio class instance
+        this.a = null;
+
         // queue which contains order of sorting (for drawing)
         this.drawingQueue = [];
 
         // drawing interval
         this.draw = null;
-
-        // audio context
-        this.audio = null;
 
         // audio output
         this.oscillator = null;
@@ -23,18 +23,15 @@ class Sort {
         this.swaps = 0;
     }
 
-    sort(algorithm, arr, delay, audio, params, log = null) {
+    sort(algorithm, arr, params, log = null) {
 
         // clearing previous sorting
         this.clear();
 
         // setting up audio
-        this.audio = audio.audio;
-        if (audio.enabled) {
-            this.oscillator = this.audio.createOscillator();
-            this.oscillator.connect(this.audio.destination);
-            this.oscillator.type = 'sine';
-            this.oscillator.start(0);
+        if (params.audioEnabled) {
+            this.a = new Audio();
+            this.oscillator = this.a.createOscillator();
         }
         
         // array verification
@@ -91,14 +88,14 @@ class Sort {
                 let y = 500;
 
                 // setting default color (green)
-                let col = 'rgb(0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ', 0';
+                let col = 'rgb(0, ' + Draw.getColor(arr, drawingArray[i].val) + ', 0';
 
                 // if this element was swapped...
                 if (drawingArray[i].swapped) {
 
                     // ...playing audio,
-                    if (audio.enabled) {
-                        th.oscillator.frequency.value = th.constructor.getLowFreq(arr, drawingArray[i].val);
+                    if (params.audioEnabled) {
+                        th.oscillator.frequency.value = Audio.getLowFreq(arr, drawingArray[i].val);
                     }
 
                     // highlighting element
@@ -108,9 +105,8 @@ class Sort {
                 else if (drawingArray[i].compared) {
 
                     // ...playing audio,
-                    if (audio.enabled) {
-                        th.oscillator.frequency.value = th.constructor.getHighFreq(arr, drawingArray[i].val);
-                        // console.log('freq: %i',th.constructor.getHighFreq(arr, drawingArray[i].val) );
+                    if (params.audioEnabled) {
+                        th.oscillator.frequency.value = Audio.getHighFreq(arr, drawingArray[i].val);
                     }
 
                     //highlighting element
@@ -120,12 +116,12 @@ class Sort {
                 else if (drawingArray[i].sorted) {
 
                     // playing audio
-                    if (audio.enabled) {
-                        th.oscillator.frequency.value = th.constructor.getHighFreq(arr, drawingArray[i].val);
+                    if (params.audioEnabled) {
+                        th.oscillator.frequency.value = Audio.getHighFreq(arr, drawingArray[i].val);
                     }
 
                     // setting color to blue
-                    col = 'rgb(0, 0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ')';
+                    col = 'rgb(0, 0, ' + Draw.getColor(arr, drawingArray[i].val) + ')';
                 }
                 
                 // drawing elements
@@ -165,7 +161,7 @@ class Sort {
                 // if they were swapped...
                 if (th.drawingQueue[drawingIterator].op === 'swap') {
                     // ...swap them in the drawingArray
-                    th.swap(drawingArray, i, j);
+                    drawingArray.swap(i, j);
 
                     // they will be highlighted on next iteration
                     drawingArray[i].swapped = true;
@@ -200,12 +196,12 @@ class Sort {
                 clearInterval(th.draw);
 
                 // ...and stop audio
-                if (audio.enabled) {
-                    th.oscillator.stop(th.audio.currentTime + 0.1);
+                if (params.audioEnabled) {
+                    th.oscillator.stop(th.a.context.currentTime + 0.1);
                 }
             }
             // if the array is sorted but isn't drew (it isn't blue)...
-            else if (th.isSorted(drawingArray)) {
+            else if (drawingArray.isSorted()) {
 
                 // ...push all the elements to drawingQueue
                 for (let i = 0; i < drawingArray.length; i++) {
@@ -222,7 +218,7 @@ class Sort {
             // changing stats
             comparisonsStats.innerHTML = th.comparisons;
             swapsStats.innerHTML = th.swaps;
-        }, delay, th);
+        }, params.delay, th);
 
 
         // timer initial value
@@ -234,7 +230,6 @@ class Sort {
         // calling sorting algorithm
         try {
             let algo = algorithm + 'Sort';
-            console.log(algo);
             this[algo](arr);
         } 
         catch (e) {
@@ -276,7 +271,7 @@ class Sort {
         for (let i = 0; i < arr.length - 1; i++) {
             for (let j = i + 1; j < arr.length; j++) {
                 if (arr[j] < arr[i]) {
-                    this.swap(arr, i, j);
+                    arr.swap(i, j);
                     this.swapPush(i, j);
                 }
                 else {
@@ -291,7 +286,7 @@ class Sort {
         while (left < right) {
             for (let i = left; i < right; i++) {
                 if (arr[i + 1] < arr[i]) {
-                    this.swap(arr, i, i + 1);
+                    arr.swap(i, i + 1);
                     this.swapPush(i, i + 1);
                 }
                 else {
@@ -302,7 +297,7 @@ class Sort {
 
             for (let i = right; i > left; i--) {
                 if (arr[i - 1] > arr[i]) {
-                    this.swap(arr, i, i - 1);
+                    arr.swap(i, i - 1);
                     this.swapPush(i, i - 1);
                 }
                 else {
@@ -319,7 +314,7 @@ class Sort {
         while (step > 1) {
             for (let i = 0; i + step < arr.length; i++) {
                 if (arr[i + step] < arr[i]) {
-                    this.swap(arr, i, i + step);
+                    arr.swap(i, i + step);
                     this.swapPush(i, i + step);
                 }
                 else {
@@ -334,7 +329,7 @@ class Sort {
             swapped = false;
             for (let i = 0; i < arr.length - 1; i++) {
                 if (arr[i + 1] < arr[i]) {
-                    this.swap(arr, i, i + 1);
+                    arr.swap(i, i + 1);
                     this.swapPush(i, i + 1);
                     swapped = true;
                 }
@@ -348,7 +343,7 @@ class Sort {
     insertionSort(arr) {
         for (let i = 1; i < arr.length; i++) {
             for (let j = i; j > 0 && arr[j - 1] > arr[j]; j--) {
-                this.swap(arr, j, j - 1);
+                arr.swap(j, j - 1);
                 this.swapPush(j, j - 1);
             }
         }
@@ -359,7 +354,7 @@ class Sort {
         while (step > 0) {
             for (let i = step; i < arr.length; i++) {
                 for (let j = i - step; j >= 0 && arr[j + step] < arr[j]; j -= step) {
-                    this.swap(arr, j, j + step);
+                    arr.swap(j, j + step);
                     this.swapPush(j, j + step);
                 }
             }
@@ -375,7 +370,7 @@ class Sort {
                 i++;
             }
             else {
-                this.swap(arr, i, i - 1);
+                arr.swap(i, i - 1);
                 this.swapPush(i, i - 1);
                 i--;
             }
@@ -391,7 +386,7 @@ class Sort {
                     minInd = j;
                 }
             }
-            this.swap(arr, i, minInd);
+            arr.swap(i, minInd);
             this.swapPush(i, minInd);
         }
     }
@@ -435,24 +430,6 @@ class Sort {
 
     // ***** SORTING ALGORITHMS END *****
 
-    // swap arr[i] and arr[j]
-    swap(arr, i, j) {
-        let temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
-    }
-
-    // check if arr is sorted
-    isSorted(arr) {
-        for (let i = 1; i < arr.length; i++) {
-            if (arr[i].val < arr[i - 1].val) {
-                return false;
-            }
-        }
-    
-        return true;
-    }
-
     // clear previous sorting
     clear() {
 
@@ -464,7 +441,7 @@ class Sort {
 
             // stop audio
             try {
-                this.oscillator.stop(this.audio.currentTime);
+                this.oscillator.stop(this.a.context.currentTime);
             }
             catch (e) {
                 // yeah
@@ -476,7 +453,7 @@ class Sort {
             this.d = null;
             this.swaps = 0;
             this.comparisons = 0;
-            this.audio = null;
+            this.a = null;
 
         }
     }
@@ -495,56 +472,5 @@ class Sort {
             elements: { i, j },
             op: 'comp'
         });
-    }
-
-    // normalize arr[i] in range [70; 220] (to get color based on value of array element)
-    static getColor(arr, x) {
-        let minMax = this.getMinMax(arr);
-
-        let mn = minMax.mn;
-        let mx = minMax.mx;
-        
-        let range = mx - mn;
-
-        return (x - mn) / range * 150 + 70;
-    }
-
-    // normalize arr[i] in range [200; 270] (to get high freq based on value of array element)
-    static getHighFreq(arr, x) {
-        let minMax = this.getMinMax(arr);
-        
-        let mn = minMax.mn;
-        let mx = minMax.mx;
-        
-        let range = mx - mn;
-
-        return (x - mn) / range * 70 + 200;
-    }
-
-    // normalize arr[i] in range [100; 150] (to get low freq based on value of array element)
-    static getLowFreq(arr, x) {
-        let minMax = this.getMinMax(arr);
-        
-        let mn = minMax.mn;
-        let mx = minMax.mx;
-        
-        let range = mx - mn;
-
-        return (x - mn) / range * 50 + 100;
-    }
-
-    static getMinMax(arr) {
-        let mn = 1e9;
-        let mx = 0;
-        for (let i = 0; i < arr.length; i++) {
-            if (arr[i] > mx) {
-                mx = arr[i];
-            }
-            if (arr[i] < mn) {
-                mn = arr[i];
-            }
-        }
-
-        return { mn, mx };
     }
 }

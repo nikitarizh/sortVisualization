@@ -20,14 +20,10 @@ function main() {
     init();
 
     // setting up audio
-    let audio = null;
     let audioEnabled = false;
 
     // Audio is currently supported only in Chrome
     if (window.navigator.userAgent.indexOf('Chrome') !== -1) {
-
-        // initializing context
-        audio = new AudioContext();
 
         // enabling it by user input
         document.getElementById('enableAudio').addEventListener('click', function() {
@@ -37,7 +33,7 @@ function main() {
             this.classList.add('disabled');
 
             // enabling audio
-            audio.resume().then(function() {
+            new AudioContext().resume().then(function() {
                 audioEnabled = true;
             });
         });
@@ -87,15 +83,29 @@ function main() {
             window.scrollTo(0, 0);
 
             // if the array is sorted, empty it and fill with new elements
-            if (isSorted(arr) || arrLength !== 1e2) {
+            if (arr.isSorted() || arrLength !== 1e2) {
                 arr = [];
                 for (let i = 0; i < arrLength; i++) {
                     arr.push(Math.trunc(Math.random() * 490 + 5));
                 }
             }
 
+            // build params
+            let params = {
+                delay,
+                audioEnabled,
+                shape,
+                setTimer: true
+            }
+
+            // build logging params
+            let loggingParams = {
+                io: false, 
+                timer: true
+            }
+
             // sort it
-            s.sort(this.id, arr, delay, { audio: audio, enabled: audioEnabled }, { setTimer: true, shape }, { io: false, timer: true });
+            s.sort(this.id, arr, params, loggingParams);
         });
     });
 }
@@ -117,7 +127,7 @@ function init() {
         cellWidth = document.body.offsetWidth / arr.length;
         let x = i * cellWidth;
         let y = 500;
-        let col = 'rgb(0, ' + Sort.getColor(arr, arr[i]) + ', 0)';
+        let col = 'rgb(0, ' + Draw.getColor(arr, arr[i]) + ', 0)';
 
         if (shape === 'columns') {
             d.drawRectangle(x, y, cellWidth, -arr[i], col);
@@ -129,15 +139,4 @@ function init() {
             d.drawCircle(x + cellWidth / 2, y - arr[i] + cellWidth / 2, cellWidth / 2, col);
         }
     }
-}
-
-// check if arr is sorted
-function isSorted(arr) {
-    for (let i = 1; i < arr.length; i++) {
-        if (arr[i] < arr[i - 1]) {
-            return false;
-        }
-    }
-
-    return true;
 }
