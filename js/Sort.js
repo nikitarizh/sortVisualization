@@ -143,9 +143,15 @@ class Sort {
 
     insertionSort(arr) {
         for (let i = 1; i < arr.length; i++) {
-            for (let j = i; j > 0 && arr[j - 1] > arr[j]; j--) {
-                arr.swap(j, j - 1);
-                this.drawingQueue.swapPush(j, j - 1);
+            for (let j = i; j > 0; j--) {
+                if (arr[j - 1] > arr[j]) {
+                    arr.swap(j, j - 1);
+                    this.drawingQueue.swapPush(j, j - 1);
+                }
+                else {
+                    this.drawingQueue.compPush(j, j - 1);
+                    break;
+                }
             }
         }
     }
@@ -154,9 +160,15 @@ class Sort {
         let step = Math.floor(arr.length / 2);
         while (step > 0) {
             for (let i = step; i < arr.length; i++) {
-                for (let j = i - step; j >= 0 && arr[j + step] < arr[j]; j -= step) {
-                    arr.swap(j, j + step);
-                    this.drawingQueue.swapPush(j, j + step);
+                for (let j = i - step; j >= 0; j -= step) {
+                    if (arr[j + step] < arr[j]) {
+                        arr.swap(j, j + step);
+                        this.drawingQueue.swapPush(j, j + step);
+                    }
+                    else {
+                        this.drawingQueue.compPush(j, j + step);
+                        break;
+                    }
                 }
             }
 
@@ -167,13 +179,14 @@ class Sort {
     gnomeSort(arr) {
         let i = 0;
         while (i < arr.length) {
-            if (i == 0 || arr[i] >= arr[i - 1]) {
-                i++;
-            }
-            else {
+            if (i != 0 && arr[i] < arr[i - 1]) {
                 arr.swap(i, i - 1);
                 this.drawingQueue.swapPush(i, i - 1);
                 i--;
+            }
+            else {
+                this.drawingQueue.compPush(i, i - 1);
+                i++;
             }
         }
     }
