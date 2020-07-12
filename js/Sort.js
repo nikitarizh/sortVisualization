@@ -182,7 +182,7 @@ class Sort {
             }
             // if the array is sorted but isn't drew (it isn't blue)...
             else if (th.isSorted(drawingArray)) {
-                
+
                 // ...push all the elements to drawingQueue
                 for (let i = 0; i < drawingArray.length; i++) {
                     th.drawingQueue.push({
@@ -253,7 +253,6 @@ class Sort {
             for (let j = i + 1; j < arr.length; j++) {
                 if (arr[j] < arr[i]) {
                     this.swap(arr, i, j);
-                    this.swapPush(i, j);
                 }
                 else {
                     this.compPush(i, j);
@@ -268,7 +267,6 @@ class Sort {
             for (let i = left; i < right; i++) {
                 if (arr[i + 1] < arr[i]) {
                     this.swap(arr, i, i + 1);
-                    this.swapPush(i, i + 1);
                 }
                 else {
                     this.compPush(i, i + 1);
@@ -279,7 +277,6 @@ class Sort {
             for (let i = right; i > left; i--) {
                 if (arr[i - 1] > arr[i]) {
                     this.swap(arr, i, i - 1);
-                    this.swapPush(i, i - 1);
                 }
                 else {
                     this.compPush(i, i - 1);
@@ -296,7 +293,6 @@ class Sort {
             for (let i = 0; i + step < arr.length; i++) {
                 if (arr[i + step] < arr[i]) {
                     this.swap(arr, i, i + step);
-                    this.swapPush(i, i + step);
                 }
                 else {
                     this.compPush(i, i + step);
@@ -311,7 +307,6 @@ class Sort {
             for (let i = 0; i < arr.length - 1; i++) {
                 if (arr[i + 1] < arr[i]) {
                     this.swap(arr, i, i + 1);
-                    this.swapPush(i, i + 1);
                     swapped = true;
                 }
                 else {
@@ -325,7 +320,6 @@ class Sort {
         for (let i = 1; i < arr.length; i++) {
             for (let j = i; j > 0 && arr[j - 1] > arr[j]; j--) {
                 this.swap(arr, j, j - 1);
-                this.swapPush(j, j - 1);
             }
         }
     }
@@ -336,7 +330,6 @@ class Sort {
             for (let i = step; i < arr.length; i++) {
                 for (let j = i - step; j >= 0 && arr[j + step] < arr[j]; j -= step) {
                     this.swap(arr, j, j + step);
-                    this.swapPush(j, j + step);
                 }
             }
 
@@ -352,7 +345,6 @@ class Sort {
             }
             else {
                 this.swap(arr, i, i - 1);
-                this.swapPush(i, i - 1);
                 i--;
             }
         }
@@ -368,7 +360,6 @@ class Sort {
                 }
             }
             this.swap(arr, i, minInd);
-            this.swapPush(i, minInd);
         }
     }
 
@@ -416,6 +407,7 @@ class Sort {
         let temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
+        this.swapPush(i, j);
     }
 
     // check if arr is sorted
