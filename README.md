@@ -3,11 +3,15 @@
 It's a script which shows you how different algorithms sort arrays, so you can understand how these algorithms work
 ## How to use
 1. Open https://nikitarizh.github.io/sortVisualization/
-2. Set length of array (using the text input field)
-3. Set frame time (1 for quick demo, 10-20 for medium speed, 50-100 is for slow)
-4. Enable audio (high freq is comparing, low freq is swapping) (Optional, Chrome only)
-5. Click on a button titled with the type of sorting you want to be visualized
-6. Enjoy!
+2. Click on a button titled with the type of sorting you want to be visualized
+3. Enjoy!
+#### Advanced use
+You can also set length of array, frame time, shapes and enable audio output
+1. Set length of array using the first input field (**100** by default)
+2. Set frame time using the second input field (1 for quick demo, 10-20 for medium speed, 50-100 is for slow) (**20** by default)
+3. Enable audio by pressing the button (high freq is comparing, low freq is swapping) (Optional, **_Chrome only_**)
+4. Set shapes by clicking a thumbnail (**circles** by default)
+
 ## TODO list:
  - [x] Bubble sort
  - [x] Shaker sort

@@ -44,6 +44,7 @@ function main() {
     }
     else {
         document.getElementById('enableAudio').disabled = 'true';
+        document.getElementsByClassName('chromeOnly')[0].style.display = 'inline';
     }
     
     // default values in inputs
@@ -82,6 +83,8 @@ function main() {
     // setting event listeners for sorting algorithms buttons
     Array.prototype.forEach.call(document.getElementsByClassName('button'), function(elem) {
         elem.addEventListener('click', function() {
+
+            window.scrollTo(0, 0);
 
             // if the array is sorted, empty it and fill with new elements
             if (isSorted(arr) || arrLength !== 1e2) {
