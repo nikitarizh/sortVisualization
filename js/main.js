@@ -6,9 +6,13 @@ let arrLength = 1e2;
 // frame time
 let delay = 20;
 
+// shape
+let shape = 'circles';
+
 // params inputs
 const lengthInput = document.getElementById('length');
 const delayInput = document.getElementById('delay');
+const shapesInputs = document.getElementsByClassName('shape');
 
 function main() {
 
@@ -45,6 +49,7 @@ function main() {
     // default values in inputs
     lengthInput.value = arrLength;
     delayInput.value = 20;
+    document.querySelector('.shape#' + shape).classList.add('selected');
 
     // change length of array
     lengthInput.addEventListener('focusout', function() {
@@ -54,6 +59,21 @@ function main() {
     // change frame time
     delayInput.addEventListener('focusout', function() {
         delay = delayInput.value;
+    });
+
+    // change shapes
+    Array.prototype.forEach.call(shapesInputs, function(elem) {
+        elem.addEventListener('click', function() {
+            
+            // make previous shape input unselected
+            document.getElementById(shape).classList.remove('selected');
+
+            // change shape
+            shape = this.id;
+
+            // make current shape input selected
+            this.classList.add('selected');
+        })
     });
 
     // initializing Sort class
@@ -72,7 +92,7 @@ function main() {
             }
 
             // sort it
-            s.sort(this.id, arr, delay, { audio: audio, enabled: audioEnabled }, true, { io: false, timer: true });
+            s.sort(this.id, arr, delay, { audio: audio, enabled: audioEnabled }, { setTimer: true, shape }, { io: false, timer: true });
         });
     });
 }
@@ -95,7 +115,16 @@ function init() {
         let x = i * cellWidth;
         let y = 500;
         let col = 'rgb(0, ' + Sort.getColor(arr, arr[i]) + ', 0)';
-        d.drawRectangle(x, y, cellWidth, -arr[i], col);
+
+        if (shape === 'columns') {
+            d.drawRectangle(x, y, cellWidth, -arr[i], col);
+        }
+        else if (shape === 'squares') {
+            d.drawRectangle(x, y - arr[i], cellWidth, cellWidth, col);
+        }
+        else if (shape === 'circles') {
+            d.drawCircle(x + cellWidth / 2, y - arr[i] + cellWidth / 2, cellWidth / 2, col);
+        }
     }
 }
 

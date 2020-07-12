@@ -23,7 +23,7 @@ class Sort {
         this.swaps = 0;
     }
 
-    sort(algorithm, arr, delay, audio, setTimer = false, log = null) {
+    sort(algorithm, arr, delay, audio, params, log = null) {
 
         // clearing previous sorting
         this.clear();
@@ -33,7 +33,7 @@ class Sort {
         if (audio.enabled) {
             this.oscillator = this.audio.createOscillator();
             this.oscillator.connect(this.audio.destination);
-            this.oscillator.type = 'triangle';
+            this.oscillator.type = 'sine';
             this.oscillator.start(0);
         }
         
@@ -62,7 +62,7 @@ class Sort {
             drawingArray.push( { val: arr[i], swapped: false, compared: false });
         }
 
-        // width of one array element (column)
+        // width of one array element (column, square, etc.)
         let cellWidth;
 
         // defining this for setInterval
@@ -83,60 +83,77 @@ class Sort {
             //drawing elements
             for (let i = 0; i < drawingArray.length; i++) {
 
-                // calculating width of columns
+                // calculating width of elements
                 cellWidth = document.body.offsetWidth / drawingArray.length;
 
                 // calculating coordinates
                 let x = i * cellWidth;
                 let y = 500;
 
+                // setting default color (green)
+                let col = 'rgb(0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ', 0';
+
                 // if this element was swapped...
                 if (drawingArray[i].swapped) {
 
                     // ...playing audio,
                     if (audio.enabled) {
-                        th.oscillator.frequency.value = drawingArray[i].val / 2;
+                        th.oscillator.frequency.value = th.constructor.getLowFreq(arr, drawingArray[i].val);
                     }
 
-                    // drawing,
-                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, '#ff5500');
-
-                    // it's swapped
-                    drawingArray[i].swapped = false;
+                    // highlighting element
+                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val + cellWidth / 2, '#ff5500');
                 }
                 // if this element was compared...
                 else if (drawingArray[i].compared) {
 
                     // ...playing audio,
                     if (audio.enabled) {
-                        th.oscillator.frequency.value = drawingArray[i].val * 2;
+                        th.oscillator.frequency.value = th.constructor.getHighFreq(arr, drawingArray[i].val);
+                        // console.log('freq: %i',th.constructor.getHighFreq(arr, drawingArray[i].val) );
                     }
 
-                    //drawing,
-                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, '#fffb00');
-
-                    //it's compared
-                    drawingArray[i].compared = false;
+                    //highlighting element
+                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val + cellWidth / 2, '#fffb00');
                 }
-                // if the array is sorted, all the elements have sorted attribute set true
+                // if the array is sorted, all the elements have 'sorted' attribute set true
                 else if (drawingArray[i].sorted) {
 
                     // playing audio
                     if (audio.enabled) {
-                        th.oscillator.frequency.value = drawingArray[i].val * 2;
+                        th.oscillator.frequency.value = th.constructor.getHighFreq(arr, drawingArray[i].val);
                     }
 
-                    // drawing blue column
-                    let col = 'rgb(0, 0, ' + th.constructor.getColor(arr, drawingArray[i].val);
-                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
+                    // setting color to blue
+                    col = 'rgb(0, 0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ')';
                 }
-                // if the element is the element
-                else {
+                
+                // drawing elements
+                //  drawing columns
+                if (params.shape === 'columns') {
 
-                    //drawing green column
-                    let col = 'rgb(0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ', 0)';
-                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
+                    // if element is highlighted we draw a little square on top (otherwise highlight will be invisible)
+                    if (drawingArray[i].compared || drawingArray[i].swapped) {
+                        th.d.drawRectangle(x, y - drawingArray[i].val, cellWidth, cellWidth, col);
+                    }
+
+                    // if no, we draw a column
+                    else {
+                        th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
+                    }
                 }
+                //  drawing squares
+                else if (params.shape === 'squares') {
+                    th.d.drawRectangle(x, y - drawingArray[i].val, cellWidth, cellWidth, col);
+                }
+                //  drawing circles
+                else if (params.shape === 'circles') {
+                    th.d.drawCircle(x + cellWidth / 2, y - drawingArray[i].val + cellWidth / 2, cellWidth / 2, col);
+                }
+
+                // setting 'compared' and 'swapped' attributes to default values
+                drawingArray[i].compared = false;
+                drawingArray[i].swapped = false;
             }
             // if there are unprocessed changes
             if (th.drawingQueue.length > drawingIterator) {
@@ -210,7 +227,7 @@ class Sort {
 
         // timer initial value
         let t0;
-        if (setTimer) {
+        if (params.setTimer) {
             t0 = performance.now();
         }
 
@@ -233,7 +250,7 @@ class Sort {
 
         // logging
         let execTime = 0;
-        if (setTimer) {
+        if (params.setTimer) {
             execTime = performance.now() - t0;
 
             let time;
@@ -480,8 +497,43 @@ class Sort {
         });
     }
 
-    // normalize arr[i] in range [70, 220] (to get color based on value of array element)
+    // normalize arr[i] in range [70; 220] (to get color based on value of array element)
     static getColor(arr, x) {
+        let minMax = this.getMinMax(arr);
+
+        let mn = minMax.mn;
+        let mx = minMax.mx;
+        
+        let range = mx - mn;
+
+        return (x - mn) / range * 150 + 70;
+    }
+
+    // normalize arr[i] in range [200; 270] (to get high freq based on value of array element)
+    static getHighFreq(arr, x) {
+        let minMax = this.getMinMax(arr);
+        
+        let mn = minMax.mn;
+        let mx = minMax.mx;
+        
+        let range = mx - mn;
+
+        return (x - mn) / range * 70 + 200;
+    }
+
+    // normalize arr[i] in range [100; 150] (to get low freq based on value of array element)
+    static getLowFreq(arr, x) {
+        let minMax = this.getMinMax(arr);
+        
+        let mn = minMax.mn;
+        let mx = minMax.mx;
+        
+        let range = mx - mn;
+
+        return (x - mn) / range * 50 + 100;
+    }
+
+    static getMinMax(arr) {
         let mn = 1e9;
         let mx = 0;
         for (let i = 0; i < arr.length; i++) {
@@ -492,9 +544,7 @@ class Sort {
                 mn = arr[i];
             }
         }
-        
-        let range = mx - mn;
 
-        return (x - mn) / range * 150 + 70;
+        return { mn, mx };
     }
 }

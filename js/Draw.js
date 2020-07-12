@@ -1,8 +1,6 @@
 // Draw class
 
 class Draw {
-    // context;
-
 
     // setting up
     constructor(canvId) {
@@ -16,5 +14,12 @@ class Draw {
     drawRectangle(x, y, width, height, color) {
         this.context.fillStyle = color;
         this.context.fillRect(x, y, width, height);
+    }
+
+    drawCircle(x, y, r, color) {
+        this.context.beginPath();
+        this.context.arc(x, y, r, 0, 2 * Math.PI);
+        this.context.fillStyle = color;
+        this.context.fill();
     }
 }
