@@ -2,24 +2,26 @@
 
 class Sort {
 
-    // Draw class instance
-    d;
+    constructor() {
+        // Draw class instance
+        this.d = null;
 
-    // queue which contains order of sorting (for drawing)
-    drawingQueue = [];
+        // queue which contains order of sorting (for drawing)
+        this.drawingQueue = [];
 
-    // drawing interval
-    draw;
+        // drawing interval
+        this.draw = null;
 
-    // audio context
-    audio;
+        // audio context
+        this.audio = null;
 
-    // audio output
-    oscillator;
+        // audio output
+        this.oscillator = null;
 
-    // stats
-    comparisons = 0;
-    swaps = 0;
+        // stats
+        this.comparisons = 0;
+        this.swaps = 0;
+    }
 
     sort(algorithm, arr, delay, audio, setTimer = false, log = null) {
 

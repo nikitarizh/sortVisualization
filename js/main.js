@@ -16,20 +16,32 @@ function main() {
     init();
 
     // setting up audio
-    let audio = new AudioContext();
+    let audio = null;
     let audioEnabled = false;
-    // enabling it by user input
-    document.getElementById('enableAudio').addEventListener('click', function() {
-        // disabling button
-        this.disabled = 'true';
-        this.classList.add('disabled');
 
-        // enabling audio
-        audio.resume().then(function() {
-            audioEnabled = true;
+    // Audio is currently supported only in Chrome
+    if (window.navigator.userAgent.indexOf('Chrome') !== -1) {
+
+        // initializing context
+        audio = new AudioContext();
+
+        // enabling it by user input
+        document.getElementById('enableAudio').addEventListener('click', function() {
+
+            // disabling button
+            this.disabled = 'true';
+            this.classList.add('disabled');
+
+            // enabling audio
+            audio.resume().then(function() {
+                audioEnabled = true;
+            });
         });
-    });
-
+    }
+    else {
+        document.getElementById('enableAudio').disabled = 'true';
+    }
+    
     // default values in inputs
     lengthInput.value = arrLength;
     delayInput.value = 20;
@@ -46,6 +58,7 @@ function main() {
 
     // initializing Sort class
     let s = new Sort();
+
     // setting event listeners for sorting algorithms buttons
     Array.prototype.forEach.call(document.getElementsByClassName('button'), function(elem) {
         elem.addEventListener('click', function() {
@@ -66,6 +79,7 @@ function main() {
 
 // is called on page load
 function init() {
+    
     // fill the array with random elements
     for (let i = 0; i < arrLength; i++) {
         arr.push(Math.trunc(Math.random() * 490 + 5));

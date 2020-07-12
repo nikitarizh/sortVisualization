@@ -5,7 +5,7 @@ It's a script which shows you how different algorithms sort arrays, so you can u
 1. Open https://nikitarizh.github.io/sortVisualization/
 2. Set length of array (using the text input field)
 3. Set frame time (1 for quick demo, 10-20 for medium speed, 50-100 is for slow)
-4. Enable audio (if you want ofc) (high freq is comparing, low freq is swapping)
+4. Enable audio (high freq is comparing, low freq is swapping) (Optional, Chrome only)
 5. Click on a button titled with the type of sorting you want to be visualized
 6. Enjoy!
 ## TODO list:

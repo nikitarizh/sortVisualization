@@ -1,7 +1,8 @@
 // Draw class
 
 class Draw {
-    context;
+    // context;
+
 
     // setting up
     constructor(canvId) {
