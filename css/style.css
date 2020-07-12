@@ -90,7 +90,11 @@ html {
     transition: .1s;
 }
 
-.shape:hover > .shapeInput, .shape.selected > .shapeInput {
+.shape:hover > .shapeInput {
+    background-color: #b7b8ff;
+}
+
+.shape.selected > .shapeInput {
     background-color: #5053ff;
 }
 
