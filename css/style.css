@@ -41,7 +41,7 @@ html {
 
 .inputWrapper .error {
     color: #ff1c28;
-    /* display: none; */
+    display: none;
 }
 
 .inputWrapper .chromeOnly {
