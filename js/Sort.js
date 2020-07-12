@@ -3,14 +3,18 @@ class Sort {
     d;
     drawingQueue = null;
     draw;
+    audio;
+    oscillator;
 
-    sort(algorithm, arr, delay, setTimer = false, log = null) {
+    sort(algorithm, arr, delay, audio, setTimer = false, log = null) {
 
         this.clear();
 
         this.d = new Draw('canv');
         this.drawingQueue = [];
         let drawingIterator = 0;
+
+        this.audio = audio.audio;
         
         // array verification
         if (arr === undefined || arr === null || arr.length === 0) {
@@ -30,7 +34,15 @@ class Sort {
 
         let cellWidth;
         let th = this;
-            
+
+        if (audio.enabled) {
+            this.oscillator = this.audio.createOscillator();
+            this.oscillator.connect(this.audio.destination);
+            this.oscillator.type = 'triangle';
+            this.oscillator.start(0);
+        }
+        
+        let sorted = false;
         this.draw = setInterval(function(th) {
             th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#000');
             for (let i = 0; i < drawingArray.length; i++) {
@@ -38,12 +50,27 @@ class Sort {
                 let x = i * cellWidth;
                 let y = 500;
                 if (drawingArray[i].swapped) {
+                    if (audio.enabled) {
+                        th.oscillator.frequency.value = drawingArray[i].val / 2;
+                    }
+
                     th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, '#ff5500');
+
                     drawingArray[i].swapped = false;
                 }
                 else if (drawingArray[i].compared) {
+                    if (audio.enabled) {
+                        th.oscillator.frequency.value = drawingArray[i].val * 2;
+                    }
+
                     th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, '#fffb00');
+
                     drawingArray[i].compared = false;
+                }
+                else if (drawingArray[i].sorted) {
+                    th.oscillator.frequency.value = drawingArray[i].val * 2;
+                    let col = 'rgb(0, 0, ' + th.constructor.getColor(arr, drawingArray[i].val);
+                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
                 }
                 else {
                     let col = 'rgb(0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ', 0)';
@@ -63,23 +90,25 @@ class Sort {
                     drawingArray[i].compared = true;
                     drawingArray[j].compared = true;
                 }
+                else if (th.drawingQueue[drawingIterator].op === 'sorted') {
+                    drawingArray[i].sorted = true;
+                }
                 
                 drawingIterator++;
             }
-
-            if (th.isSorted(drawingArray)) {
+            else if (sorted) {
                 clearInterval(th.draw);
-
-                th.d.drawRectangle(0, 0, document.body.offsetWidth, 500, '#242424');
-                for (let i = 0; i < drawingArray.length; i++) {
-                    cellWidth = document.body.offsetWidth / drawingArray.length;
-                    let x = i * cellWidth;
-                    let y = 500;
-                    let col = 'rgb(0, ' + th.constructor.getColor(arr, drawingArray[i].val) + ', 0)';
-                    th.d.drawRectangle(x, y, cellWidth, -drawingArray[i].val, col);
-                }
+                th.oscillator.stop(th.audio.currentTime + 0.1);
             }
-                
+            else if (th.isSorted(drawingArray)) {
+                for (let i = 0; i < drawingArray.length; i++) {
+                    th.drawingQueue.push({
+                        elements: { i, j: i},
+                        op: 'sorted'
+                    });
+                }
+                sorted = true;
+            }
         }, delay, th);
         // calling sorting algorithm
         switch (algorithm) {
@@ -389,6 +418,11 @@ class Sort {
             clearInterval(this.draw);
             this.drawingQueue = null;
             this.d = null;
+            try {
+                this.oscillator.stop(this.audio.currentTime);
+            }
+            catch (e) {}
+            this.audio = null;
         }
     }
 

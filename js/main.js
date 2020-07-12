@@ -10,7 +10,15 @@ function main() {
 
     init();
 
-    let s = new Sort();
+    let audio = new AudioContext();
+    let audioEnabled = false;
+    document.getElementById('enableAudio').addEventListener('click', function() {
+        this.disabled = 'true';
+        this.classList.add('disabled');
+        audio.resume().then(function() {
+            audioEnabled = true;
+        });
+    });
 
     lengthInput.value = arrLength;
     delayInput.value = 20;
@@ -23,6 +31,7 @@ function main() {
         delay = delayInput.value;
     });
 
+    let s = new Sort();
     Array.prototype.forEach.call(document.getElementsByClassName('button'), function(elem) {
         elem.addEventListener('click', function() {
             
@@ -33,7 +42,7 @@ function main() {
                 }
             }
 
-            s.sort(this.id, arr, delay, true, { io: false, timer: true });
+            s.sort(this.id, arr, delay, { audio: audio, enabled: audioEnabled }, true, { io: false, timer: true });
         });
     });
 }

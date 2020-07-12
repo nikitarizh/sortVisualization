@@ -47,7 +47,7 @@ html {
     text-align: center;
 }
 
-.buttons div span {
+.buttons div span, button {
     border: 1px solid #dbdbdb;
     cursor: pointer;
     padding: 5px 10px;
@@ -59,8 +59,12 @@ html {
 
 }
 
-.buttons div span:hover {
+.buttons div span:hover, button:not(.disabled):hover {
     background-color: #3f3f3f;
     border: 1px solid #3f3f3f;
     color: #fff;
+}
+
+button:focus {
+    outline: none;
 }
